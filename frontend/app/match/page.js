@@ -25,38 +25,46 @@ export default function MatchPage() {
         setMessage('Failed to load users. Is the backend running?');
       });
   }, []);
-
+//---------------------------
   const handleMatch = async () => {
-    if (!selectedCandidate || !selectedInterviewer) {
-      setMessage('⚠️ Please select both a candidate and an interviewer');
-      return;
-    }
+  if (!selectedCandidate || !selectedInterviewer) {
+    setMessage('⚠️ Please select both a candidate and an interviewer');
+    return;
+  }
 
-    setLoading(true);
-    setMessage('');
-    setProposals([]);
+  setLoading(true);
+  setMessage('');
+  setProposals([]);
 
-    try {
-      const res = await fetch('http://localhost:8000/api/match', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ candidateId: selectedCandidate, interviewerId: selectedInterviewer })
-      });
+  try {
+    // This line makes it work locally AND live when deployed
+    const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
 
-      const data = await res.json();
-      setProposals(data.proposals || []);
-      setMessage(
-        data.message || 
-        (data.proposals?.length > 0 
-          ? '🎉 Common slots found! Calendar invites sent!' 
-          : '😔 No common slots found. Try different availability.')
-      );
-    } catch (err) {
-      setMessage('❌ Error connecting to server. Check backend.');
-    }
+    const res = await fetch(`${API_URL}/api/match`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        candidateId: selectedCandidate,
+        interviewerId: selectedInterviewer
+      })
+    });
 
-    setLoading(false);
-  };
+    const data = await res.json();
+
+    setProposals(data.proposals || []);
+    setMessage(
+      data.message ||
+      (data.proposals?.length > 0
+        ? '🎉 Common slots found! Calendar invites sent!'
+        : '😔 No common slots found. Try different availability.')
+    );
+  } catch (err) {
+    console.error(err);
+    setMessage('❌ Error connecting to server. Check backend.');
+  }
+
+  setLoading(false);
+};
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 dark:from-gray-900 dark:via-purple-950 dark:to-pink-950 py-12 px-4">

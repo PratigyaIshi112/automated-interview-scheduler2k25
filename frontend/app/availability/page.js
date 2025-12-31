@@ -8,25 +8,30 @@ export default function Availability() {
   const [success, setSuccess] = useState(false);
 
   const onSubmit = async (data) => {
-    try {
-      const res = await fetch('http://localhost:8000/api/availability', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data)
-      });
-      const json = await res.json();
+  try {
+    // This automatically uses live backend when deployed, localhost when testing
+    const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
 
-      if (json.success) {
-        setSuccess(true);
-        reset(); // Clear form
-        setTimeout(() => setSuccess(false), 5000); // Hide message after 5s
-      } else {
-        alert('Error: ' + (json.error || 'Something went wrong'));
-      }
-    } catch (err) {
-      alert('Network error. Is the backend running?');
+    const res = await fetch(`${API_URL}/api/availability`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data)
+    });
+
+    const json = await res.json();
+
+    if (json.success) {
+      setSuccess(true);
+      reset(); // Clear the form
+      setTimeout(() => setSuccess(false), 5000); // Hide green message after 5 seconds
+    } else {
+      alert('❌ Error: ' + (json.error || 'Something went wrong'));
     }
-  };
+  } catch (err) {
+    console.error(err);
+    alert('🌐 Network error — Is the backend running? Check terminal.');
+  }
+};
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 dark:from-gray-900 dark:via-purple-950 dark:to-pink-950 py-12 px-4 flex items-center justify-center">
