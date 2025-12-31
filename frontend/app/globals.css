@@ -1,0 +1,62 @@
+@import "tailwindcss";
+
+:root {
+  --background: #f8fafc;
+  --foreground: #1e293b;
+  --primary-gradient-from: #6366f1;  /* Indigo */
+  --primary-gradient-to: #a78bfa;    /* Purple */
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0f172a;
+    --foreground: #f1f5f9;
+    --primary-gradient-from: #818cf8;
+    --primary-gradient-to: #c4b5fd;
+  }
+}
+
+body {
+  background: linear-gradient(135deg, #eef2ff 0%, #f3e8ff 100%);
+  color: var(--foreground);
+  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  min-height: 100vh;
+}
+
+.dark body {
+  background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%);
+}
+
+/* Big Highlighted Gradient Title */
+.big-gradient-title {
+  font-size: 4rem; /* Very big */
+  font-weight: 900;
+  text-align: center;
+  background: linear-gradient(to right, var(--primary-gradient-from), var(--primary-gradient-to));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  line-height: 1.2;
+  margin-bottom: 2rem;
+  letter-spacing: -1px;
+}
+
+@media (max-width: 768px) {
+  .big-gradient-title {
+    font-size: 3rem;
+  }
+}
+
+/* Optional: Add subtle glow */
+.big-gradient-title::after {
+  content: attr(data-text);
+  position: absolute;
+  left: 0;
+  top: 0;
+  background: linear-gradient(to right, var(--primary-gradient-from), var(--primary-gradient-to));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  filter: blur(8px);
+  opacity: 0.7;
+  z-index: -1;
+}
