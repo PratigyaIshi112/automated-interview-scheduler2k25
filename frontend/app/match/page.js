@@ -12,19 +12,32 @@ export default function MatchPage() {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState('');
 
-  useEffect(() => {
-    fetch('http://localhost:8000/api/users')
-      .then(res => res.json())
-      .then(data => {
-        setUsers(data);
-        setCandidates(data.filter(u => u.role === 'candidate'));
-        setInterviewers(data.filter(u => u.role === 'interviewer'));
-      })
-      .catch(err => {
-        console.error(err);
-        setMessage('Failed to load users. Is the backend running?');
-      });
-  }, []);
+ useEffect(() => {
+  const loadUsers = async () => {
+    try {
+      // This works locally AND on live deployment
+      const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+
+      const res = await fetch(`${API_URL}/api/users`);
+
+      if (!res.ok) {
+        throw new Error(`HTTP error! status: ${res.status}`);
+      }
+
+      const data = await res.json();
+
+      setUsers(data);
+      setCandidates(data.filter(u => u.role === 'candidate'));
+      setInterviewers(data.filter(u => u.role === 'interviewer'));
+      setMessage(''); // Clear any old error message
+    } catch (err) {
+      console.error('Failed to fetch users:', err);
+      setMessage('Failed to load users. Please try again later.');
+    }
+  };
+
+  loadUsers();
+}, []);
 //---------------------------
   const handleMatch = async () => {
   if (!selectedCandidate || !selectedInterviewer) {
